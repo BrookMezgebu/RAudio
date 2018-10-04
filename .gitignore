@@ -16,3 +16,5 @@ cmake-build-debug
 
 # IDE (Idea)
 .idea
+Connector/allMusicFiles.csv
+Connector/mux-master

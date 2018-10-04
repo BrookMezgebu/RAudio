@@ -8,13 +8,15 @@
 using namespace std;
 
 struct SINGLE_FILE {
-    string filename;
-    string filepath;
+    wstring filename;
+    wstring filepath;
 };
 
 class FILESYSTEM_INDEXING_HANDLER {
 
 public:
     vector<SINGLE_FILE> getAllMusicFiles ();
+    wstring getCsvContent(vector<SINGLE_FILE> array);
+    void writeToCSVFile (string filename);
 };
 
