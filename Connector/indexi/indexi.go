@@ -3,7 +3,6 @@ package indexi
 import (
 	"bufio"
 	"encoding/csv"
-	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -12,12 +11,7 @@ import (
 	"time"
 )
 
-type SingleMusic struct {
-	Fname string `json:"filename"`
-	Fpath string `json:"filepath"`
-}
-
-func GetRefreshedMusicList() []SingleMusic {
+func GetRefreshedMusicList() MusicFiles {
 	// start
 	cmd := exec.Command("eCLink.exe")
 	if err := cmd.Start(); err != nil {
@@ -31,18 +25,19 @@ func GetRefreshedMusicList() []SingleMusic {
 	}()
 	select {
 	case <-time.After(25 * time.Second):
-		return []SingleMusic{}
+		return MusicFiles{}
 	case <-donec:
+		os.Remove("allMusicFiles.csv")
 		os.Rename("allMusic.csv" , "allMusicFiles.csv")
 		return GetMusicList()
 	}
 }
 
-func GetMusicList() []SingleMusic {
+func GetMusicList() MusicFiles {
 	csvFile, _ := os.Open("allMusicFiles.csv")
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 
-	var musicFiles []SingleMusic
+	var musicFiles MusicFiles
 	for {
 		line, e := reader.Read()
 		if e == io.EOF {
@@ -50,7 +45,7 @@ func GetMusicList() []SingleMusic {
 		} else if e != nil {
 			log.Fatal(e)
 		}
-		musicFiles = append(musicFiles, SingleMusic{
+		musicFiles = append(musicFiles, MusicStruct{
 			Fname: line[0],
 			Fpath: line[1],
 		})
@@ -58,11 +53,6 @@ func GetMusicList() []SingleMusic {
 
 	return musicFiles
 
-}
-
-func MusicListToJson (list []SingleMusic) string {
-	filesJson, _ := json.Marshal(list)
-	return string(filesJson)
 }
 
 func FileExt (filename string) string {
