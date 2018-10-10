@@ -4,6 +4,8 @@ import (
 	"../indexi"
 	"../mux-master"
 	"bytes"
+	"fmt"
+	"github.com/mikkyang/id3-go"
 	"log"
 	"net/http"
 	"strconv"
@@ -24,6 +26,20 @@ func RefreshedListHandler (x http.ResponseWriter , b *http.Request) {
 
 func stringToByteSlice (convertable string) []byte {
 	return bytes.Trim([]byte(convertable), "\x00")
+}
+
+func _ (x string) {
+	music , err := id3.Open(x)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Music Artist : " , music.Artist())
+	fmt.Println("Music Album : " , music.Album())
+	fmt.Println("Music Genre : " , music.Genre())
+	fmt.Println("Music Year : " , music.Year())
+
 }
 
 func PrintHelp (x http.ResponseWriter , b *http.Request) {
