@@ -1,0 +1,9 @@
+body {
+    background-color: #f4ffff;
+}
+
+.App-title {
+    color: slategray;
+    font: bold 1em Consolas;
+    text-align: center;
+}
