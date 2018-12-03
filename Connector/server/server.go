@@ -128,12 +128,21 @@ func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
 	frag , _ = url.QueryUnescape(frag)
 	file , err := os.Open(frag)
 	if err != nil {
-		log.Fatal(err)
+		item := indexi.MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
+		json := item.ToJson()
+		json = strings.Replace(json , " " , "" , -1)
+		x.Write(stringToByteSlice(json))
+		return
 	}
 
 	m , err := tag.ReadFrom(file)
 	if err != nil {
 		log.Fatal(err)
+		item := indexi.MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
+		json := item.ToJson()
+		json = strings.Replace(json , " " , "" , -1)
+		x.Write(stringToByteSlice(json))
+		return
 	}
 
 	item := indexi.MusicMoreDetail{Artist: m.Artist(), Title: m.Title(), Album: m.Album(), Year: m.Year(), Genre: m.Genre(),}
