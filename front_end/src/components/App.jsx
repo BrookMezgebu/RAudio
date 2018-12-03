@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
 import '../styles/App.css'
+//import '../styles/materialize.min.css'
+import '../styles/md1.css'
 import createMuiTheme from "@material-ui/core/es/styles/createMuiTheme";
 import orange from "@material-ui/core/es/colors/orange";
 import MusicList from "./MusicList";
@@ -17,7 +19,8 @@ class App extends Component {
         super(props);
         this.state = {
             list: [],
-            alreadyCalled: false
+            alreadyCalled: false,
+            isComplete: false
         };
     }
 
@@ -32,7 +35,23 @@ class App extends Component {
             response.json().then(json => {
                 console.log(json);
                 for (let i = 0; i < json.length; i++) {
-                    this.addItem(json[i].filename);
+                    fetch(`http://localhost:8002/item_detail?file=${json[i].filepath}\\${json[i].filename}`)
+                        .then(response => response.json())
+                        .then(jsonx => {
+                            this.addItem({
+                                filename: json[i].filename,
+                                filepath: json[i].filepath,
+                                title: jsonx.title,
+                                artist: jsonx.artist,
+                                album: jsonx.album,
+                                year: jsonx.year,
+                                genre: jsonx.genre
+                            });
+                            console.log(this.state);
+                            if (i === json.length - 1) {
+                                this.setState({isComplete: true})
+                            }
+                        });
                 }
             });
 
@@ -45,12 +64,20 @@ class App extends Component {
             this.getList();
         }
 
-        return (
-          <div className="App-title">
-              <h3> Welcome To RAudio. </h3>
-              {<MusicList videos={this.state.list} />}
-          </div>
-        )
+        if (!this.state.isComplete) {
+            return (
+                <div className="App-title">
+                    <h3> Welcome To RAudio. </h3>
+                </div>
+            )
+        } else {
+            return (
+                <div className="App-title">
+                    <h3> Welcome To RAudio. </h3>
+                    {<MusicList videos={this.state.list}/>}
+                </div>
+            )
+        }
     }
 }
 

@@ -17,22 +17,22 @@ class MusicList extends Component {
 
     render() {
         const {videos} = this.props;
+        console.log(videos);
 
         return (
             <div className="video-container_0 scrolling">
                 {
                     videos.map(
-                        (com , k) => {
+                        (item , k) => {
                             return (
                                 <Grow in={this.state.faded}>
                                     <Paper key={k} elevation={4} className="single-video card waves-effect waves-light">
-                                        {/*<img src={video.img} width={'100%'} height={'100%'} className="video-image"/>*/}
-                                        {/*<div className="video-detail">*/}
-                                            {/*<span>{video.name}</span><br />*/}
-                                            {/*<span>{video.desc}</span><br />*/}
-                                            {/*<span>{video.artist}</span>*/}
-                                        {/*</div>*/}
-                                        <i> {com} </i>
+                                        <img src={"./Test8.png"} width={'100%'} height={'100%'} className="video-image"/>
+                                        <div className="video-detail">
+                                            <span>{item.title}</span><br />
+                                            <span>{item.artist}</span><br />
+                                            <span>{item.genre}</span>
+                                        </div>
                                     </Paper>
                                 </Grow>
                             )
