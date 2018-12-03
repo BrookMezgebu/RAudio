@@ -5,22 +5,24 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gorilla/mux"
-	//"github.com/mikkyang/id3-go"
+	"github.com/tag-master"
 	"log"
 	"net/http"
+	"net/url"
+	"os"
 	"strconv"
 	"strings"
 )
 
 func AllListHandler(x http.ResponseWriter, b *http.Request){
-	enableCors(&x)
+	enableACAO(&x)
 	list := indexi.GetMusicList()
 	json := list.ToJson()
 	x.Write(stringToByteSlice(json))
 }
 
 func RefreshedListHandler (x http.ResponseWriter , b *http.Request) {
-	enableCors(&x)
+	enableACAO(&x)
 	list := indexi.GetRefreshedMusicList()
 	json := list.ToJson()
 	x.Write(stringToByteSlice(json))
@@ -53,7 +55,7 @@ type Commands []Command
 
 func PrintHelp (x http.ResponseWriter , b *http.Request) {
 	var commands Commands
-	enableCors(&x)
+	enableACAO(&x)
 
 	command := Command{Com: "/limited_list/[NUM]", Fun: "gives json of [NUM] elements"}
 	commands = append(commands , command)
@@ -70,30 +72,75 @@ func PrintHelp (x http.ResponseWriter , b *http.Request) {
 }
 
 func SearchMusicName (x http.ResponseWriter , b *http.Request) {
-	enableCors(&x)
-	searchQuery := strings.Replace(b.URL.Path , "/search/" , "" ,-1)
+	enableACAO(&x)
+	searchQuery := b.FormValue("q")
+	searchQuery , errorq := url.QueryUnescape(searchQuery)
+
+	if errorq != nil {
+		print(errorq)
+		searchQuery = b.FormValue("q")
+	}
+
+	size := b.FormValue("s")
+	sizei , err := strconv.Atoi(size)
 	list := indexi.GetMusicList()
-	x.Write( stringToByteSlice( list.Search(searchQuery).ToJson()))
+
+	if err == nil && sizei < list.Search(searchQuery).Len() {
+		x.Write( stringToByteSlice( list.Search(searchQuery)[0 : sizei].ToJson()))
+	} else {
+		x.Write( stringToByteSlice( list.Search(searchQuery).ToJson()))
+	}
 }
 
 func ListLimited(x http.ResponseWriter , b * http.Request) {
-	enableCors(&x)
+	enableACAO(&x)
+
+	size := b.FormValue("size")
+
 	list := indexi.GetMusicList()
-	frag := strings.Replace(b.URL.Path , "/list_limited/" , "" , -1)
-	limit , err := strconv.Atoi(frag)
+	sizei , _ := strconv.Atoi(size)
 
-	if err != nil {
-		log.Panic(err)
-	}
-
-	list = list[0 : limit]
+	list = list[0 : sizei]
 	json := list.ToJson()
 	json = strings.Replace(json , " " , "" , -1)
 	x.Write(stringToByteSlice(json))
 }
 
-func enableCors ( rw *http.ResponseWriter) {
+func UseTagGo() {
+	file , _ := os.Open("C://t.mp3")
+	m , err := tag.ReadFrom(file)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print(m.Format()) // The detected format.
+	log.Print(m.Title())
+}
+
+func enableACAO( rw *http.ResponseWriter) {
 	(*rw).Header().Set("Access-Control-Allow-Origin" , "*")
+}
+
+func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
+	enableACAO(&x)
+	frag := strings.Replace(b.URL.Path , "/item_detail/" , "" , -1)
+	frag , _ = url.QueryUnescape(frag)
+	file , err := os.Open(frag)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	m , err := tag.ReadFrom(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	item := indexi.MusicMoreDetail{Artist: m.Artist(), Title: m.Title(), Album: m.Album(), Year: m.Year(), Genre: m.Genre(),}
+
+	json := item.ToJson()
+	json = strings.Replace(json , " " , "" , -1)
+	x.Write(stringToByteSlice(json))
 }
 
 func StartServer () {
@@ -101,8 +148,8 @@ func StartServer () {
 	r.HandleFunc("/help", PrintHelp)
 	r.HandleFunc("/list" , AllListHandler)
 	r.HandleFunc("/refreshed" , RefreshedListHandler)
-	r.HandleFunc("/list_limited/{size:[0-9]+}" , ListLimited)
-	//testMp3Loading("C:\\one.mp3")
-	r.HandleFunc("/search/{name:[a-zA-Z0-9 ]+}" , SearchMusicName)
+	r.HandleFunc("/list_limited" , ListLimited)
+	r.HandleFunc("/search" , SearchMusicName)
+	r.HandleFunc("/item_detail/{file:.}" , GetMusicDetails)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8002" , r))
 }
