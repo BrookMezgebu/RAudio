@@ -1,9 +1,179 @@
 body {
-    background-color: #f4ffff;
+    background-color: #ffffff;
 }
 
 .App-title {
     color: slategray;
     font: bold 1em Consolas;
     text-align: center;
+}
+
+.color-primary {
+    background-color: #fefffe;
+}
+
+.color-primary--dark {
+    background-color: rgb(200 , 201 , 202);
+}
+
+.color-secondary {
+    background-color: rgb(255,64,129);
+}
+
+nav {
+    height: 60px;
+    color: #333;
+}
+
+nav .brand-logo {
+    padding: 50px;
+}
+
+footer.page-footer {
+    padding: 16px 40px;
+    color: #9e9e9e;
+    background-color: #424242;
+}
+
+@media only screen and (max-width: 480px) {
+    footer.page-footer {
+        padding: 16px 10px;
+    }
+}
+
+footer a {
+    color: #9e9e9e;
+}
+
+footer h6 {
+    color: #fff;
+}
+
+.footer-copyright {
+    text-align: center;
+    align-items: center;
+    child-align: middle;
+}
+
+.main-nav {
+    background-color: #fefffe;
+    padding: 0 10px;
+    text-align: center;
+    color: #333333;
+}
+
+.appdetail {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.appicon {
+    display: inline-block;
+    width: 20%;
+    margin: 5%;
+    height: 20%;
+    float: left;
+}
+
+.appname {
+    font-size: large;
+    font-weight: bold;
+    font-family: Calibri , serif;
+    margin: 5%;
+    display: inline-list-item;
+    text-align: center;
+    float: left;
+}
+
+.single-video {
+    width: 280px;
+    justify-content: center;
+    text-align: left;
+    cursor: pointer;
+    padding: 2%;
+    position: relative;
+    display: inline-block;
+    margin: 10px;
+}
+
+.video-containter_0 {
+    scroll-behavior: smooth;
+    scrollbar-base-color: #b4b4b4;
+    height: fit-content;
+    position: absolute;
+}
+
+.video-detail {
+    background-color: rgba(33 , 33 , 33 , 55);
+    padding: 10px;
+    color: #fff3e0;
+    font-size: 0.9em;
+}
+
+.tab-bar {
+    height: 65px;
+    margin-bottom: 0%;
+}
+
+.layout__tab {
+    height: 64px;
+    line-height: 64px;
+    margin: 25px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.layout__tab.is-active {
+    border-bottom: 5px solid;
+    padding-bottom: 21px;
+    width: 100%;
+}
+
+.dark-text {
+    color: #333333;
+}
+
+.video-image {
+    width: 100%;
+    height: auto;
+}
+
+.no-top-elev {
+    border-top: 0;
+    position: relative;
+    z-index: 0;
+    top: 0;
+}
+
+#go-to-top {
+    position: fixed;
+    display: block;
+    right: 0;
+    bottom: 0;
+    margin-right: 40px;
+    margin-bottom: 40px;
+    z-index: 900;
+}
+
+.no-elevation {
+    border-bottom: 0 solid;
+    z-index: 0;
+    elevation: 0;
+    position: static;
+}
+
+.loading-screen {
+    width: 100%;
+    height: 400%;
+    display: block;
+    position: center;
+    align-items: center;
+}
+
+.no-focus-color :focus :hover ::selection{
+    background-color: rgba(255 , 255 , 255 , 0);
 }
