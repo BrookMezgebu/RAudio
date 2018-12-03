@@ -124,7 +124,7 @@ func enableACAO( rw *http.ResponseWriter) {
 
 func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
 	enableACAO(&x)
-	frag := strings.Replace(b.URL.Path , "/item_detail/" , "" , -1)
+	frag := b.FormValue("file")
 	frag , _ = url.QueryUnescape(frag)
 	file , err := os.Open(frag)
 	if err != nil {
@@ -150,6 +150,6 @@ func StartServer () {
 	r.HandleFunc("/refreshed" , RefreshedListHandler)
 	r.HandleFunc("/list_limited" , ListLimited)
 	r.HandleFunc("/search" , SearchMusicName)
-	r.HandleFunc("/item_detail/{file:.}" , GetMusicDetails)
+	r.HandleFunc("/item_detail" , GetMusicDetails)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8002" , r))
 }
