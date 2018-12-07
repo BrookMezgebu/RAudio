@@ -46,17 +46,16 @@ func PrintHelp (x http.ResponseWriter , b *http.Request) {
 	enableACAO(&x)
 
 	command := Command{Com: "/limited_list/[NUM]", Fun: "gives json of [NUM] elements"}
-	commands = append(commands , command)
+	commands = append(commands, command)
 	command = Command{Com: "/refreshed", Fun: "gives json of refreshed list"}
-	commands = append(commands , command)
+	commands = append(commands, command)
 	command = Command{Com: "/list", Fun: "gives json of all the list items"}
-	commands = append(commands , command)
+	commands = append(commands, command)
 	command = Command{Com: "/search/[STRING]", Fun: "search from stuff"}
-	commands = append(commands , command)
+	commands = append(commands, command)
 
-	commandsJson , _ := json.Marshal(commands)
+	commandsJson, _ := json.Marshal(commands)
 	x.Write(stringToByteSlice(string(commandsJson)))
-	//x.Write(stringToByteSlice("{\n \"/limited_list/[NUM]\" : \"gives json of [NUM] elements\" ,\n \"/refreshed\" : \"gives json of refreshed list\",\n \"/list\" : \"gives json of all the list items\"\n}"))
 }
 
 func SearchMusicName (x http.ResponseWriter , b *http.Request) {
