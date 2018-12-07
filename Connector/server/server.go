@@ -1,7 +1,7 @@
 package server
 
 import (
-	"../indexi"
+	. "../indexi"
 	"bytes"
 	"encoding/json"
 	"github.com/gorilla/mux"
@@ -14,16 +14,18 @@ import (
 	"strings"
 )
 
+var globalAvailableDrives []string = nil
+
 func AllListHandler(x http.ResponseWriter, b *http.Request){
 	enableACAO(&x)
-	list := indexi.GetMusicList()
+	list := GetMusicList(globalAvailableDrives)
 	json := list.ToJson()
 	x.Write(stringToByteSlice(json))
 }
 
 func RefreshedListHandler (x http.ResponseWriter , b *http.Request) {
 	enableACAO(&x)
-	list := indexi.GetRefreshedMusicList()
+	list := GetRefreshedMusicList(globalAvailableDrives)
 	json := list.ToJson()
 	x.Write(stringToByteSlice(json))
 }
@@ -31,20 +33,6 @@ func RefreshedListHandler (x http.ResponseWriter , b *http.Request) {
 func stringToByteSlice (convertable string) []byte {
 	return bytes.Trim([]byte(convertable), "\x00")
 }
-
-//func testMp3Loading (x string) {
-//	music , err := id3.Open(x)
-//
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	fmt.Println("Music Artist : " , music.Artist())
-//	fmt.Println("Music Album : " , music.Album())
-//	fmt.Println("Music Genre : " , music.Genre())
-//	fmt.Println("Music Year : " , music.Year())
-//
-//}
 
 type Command struct {
 	Com string `json:"com"`
@@ -83,7 +71,7 @@ func SearchMusicName (x http.ResponseWriter , b *http.Request) {
 
 	size := b.FormValue("s")
 	sizei , err := strconv.Atoi(size)
-	list := indexi.GetMusicList()
+	list := GetMusicList(globalAvailableDrives)
 
 	if err == nil && sizei < list.Search(searchQuery).Len() {
 		x.Write( stringToByteSlice( list.Search(searchQuery)[0 : sizei].ToJson()))
@@ -97,7 +85,7 @@ func ListLimited(x http.ResponseWriter , b * http.Request) {
 
 	size := b.FormValue("size")
 
-	list := indexi.GetMusicList()
+	list := GetMusicList(globalAvailableDrives)
 	sizei , _ := strconv.Atoi(size)
 
 	list = list[0 : sizei]
@@ -128,7 +116,7 @@ func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
 	frag , _ = url.QueryUnescape(frag)
 	file , err := os.Open(frag)
 	if err != nil {
-		item := indexi.MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
+		item := MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
 		json := item.ToJson()
 		json = strings.Replace(json , " " , "" , -1)
 		x.Write(stringToByteSlice(json))
@@ -138,21 +126,22 @@ func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
 	m , err := tag.ReadFrom(file)
 	if err != nil {
 		log.Fatal(err)
-		item := indexi.MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
+		item := MusicMoreDetail{Artist: "", Title: "", Album: "", Year: 0, Genre: "",}
 		json := item.ToJson()
 		json = strings.Replace(json , " " , "" , -1)
 		x.Write(stringToByteSlice(json))
 		return
 	}
 
-	item := indexi.MusicMoreDetail{Artist: m.Artist(), Title: m.Title(), Album: m.Album(), Year: m.Year(), Genre: m.Genre(),}
+	item := MusicMoreDetail{Artist: m.Artist(), Title: m.Title(), Album: m.Album(), Year: m.Year(), Genre: m.Genre(),}
 
 	json := item.ToJson()
 	json = strings.Replace(json , " " , "" , -1)
 	x.Write(stringToByteSlice(json))
 }
 
-func StartServer () {
+func StartServer (c []string) {
+	globalAvailableDrives = c
 	r := mux.NewRouter()
 	r.HandleFunc("/help", PrintHelp)
 	r.HandleFunc("/list" , AllListHandler)

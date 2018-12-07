@@ -1,9 +1,12 @@
 package main
 
 import (
+	"./indexi"
 	"./server"
 )
 
 func main() {
-	server.StartServer()
+
+	c := indexi.AvaliableFileSystems()
+	server.StartServer(c)
 }
