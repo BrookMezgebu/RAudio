@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func GetRefreshedMusicList() MusicFiles {
+func GetRefreshedMusicList(drives []string) MusicFiles {
 	// start
 	cmd := exec.Command("eCLink.exe")
 	if err := cmd.Start(); err != nil {
@@ -29,11 +29,11 @@ func GetRefreshedMusicList() MusicFiles {
 	case <-donec:
 		os.Remove("allMusicFiles.csv")
 		os.Rename("allMusic.csv" , "allMusicFiles.csv")
-		return GetMusicList()
+		return GetMusicList(drives)
 	}
 }
 
-func GetMusicList() MusicFiles {
+func GetMusicList(drives []string) MusicFiles {
 	csvFile, _ := os.Open("allMusicFiles.csv")
 	reader := csv.NewReader(bufio.NewReader(csvFile))
 
@@ -45,14 +45,26 @@ func GetMusicList() MusicFiles {
 		} else if e != nil {
 			log.Fatal(e)
 		}
-		musicFiles = append(musicFiles, MusicStruct{
-			Fname: line[0],
-			Fpath: line[1],
-		})
+
+		if SliceContains(drives , string(strings.ToUpper(line[1])[0])) {
+			musicFiles = append(musicFiles, MusicStruct{
+				Fname: line[0],
+				Fpath: line[1],
+			})
+		}
+
 	}
 
 	return musicFiles
+}
 
+func SliceContains (a []string , i string) bool {
+	for _ , value := range a {
+		if string(value) == i {
+			return true
+		}
+	}
+	return false
 }
 
 func FileExt (filename string) string {
@@ -62,6 +74,20 @@ func FileExt (filename string) string {
 
 	dotIndex := strings.LastIndex(filename , ".")
 	return filename[dotIndex:]
+}
+
+func AvaliableFileSystems () []string {
+	return getDrives()
+}
+
+func getDrives() (r []string) {
+	for _, drive := range "ABCDEFGHIJKLMNOPQRSTUVWXYZ" {
+		_, err := os.Open(string(drive)+":\\")
+		if err == nil {
+			r = append(r, string(drive))
+		}
+	}
+	return
 }
 
 func GetFileDetails (filepath string) (os.FileInfo , error){

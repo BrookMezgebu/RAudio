@@ -10,6 +10,14 @@ type MusicStruct struct {
 	Fpath string `json:"filepath"`
 }
 
+type MusicMoreDetail struct {
+	Artist string `json:"artist"`
+	Title string `json:"title"`
+	Album string `json:"album"`
+	Year int `json:"year"`
+	Genre string `json:"genre"`
+}
+
 type MusicFiles []MusicStruct
 
 func (s MusicFiles) Len () int {
@@ -37,4 +45,9 @@ func (s MusicFiles) Search (q string) MusicFiles{
 func (s MusicFiles) ToJson () string {
 	filesJson, _ := json.Marshal(s)
 	return string(filesJson)
+}
+
+func (s MusicMoreDetail) ToJson () string {
+	detailJson, _ := json.Marshal(s)
+	return string(detailJson)
 }
