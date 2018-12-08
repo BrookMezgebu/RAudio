@@ -93,19 +93,7 @@ func ListLimited(x http.ResponseWriter , b * http.Request) {
 	x.Write(stringToByteSlice(json))
 }
 
-func UseTagGo() {
-	file , _ := os.Open("C://t.mp3")
-	m , err := tag.ReadFrom(file)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Print(m.Format()) // The detected format.
-	log.Print(m.Title())
-}
-
-func enableACAO( rw *http.ResponseWriter) {
+func enableACAO(rw *http.ResponseWriter) {
 	(*rw).Header().Set("Access-Control-Allow-Origin" , "*")
 }
 
@@ -139,6 +127,13 @@ func GetMusicDetails (x http.ResponseWriter , b *http.Request) {
 	x.Write(stringToByteSlice(json))
 }
 
+func GetAvailableDrives (x http.ResponseWriter , r *http.Request) {
+	enableACAO(&x)
+	globalAvailableDrives = AvaliableFileSystems()
+	jsonData , _ := json.Marshal(globalAvailableDrives)
+	x.Write(stringToByteSlice(string(jsonData)))
+}
+
 func StartServer (c []string) {
 	globalAvailableDrives = c
 	r := mux.NewRouter()
@@ -147,6 +142,7 @@ func StartServer (c []string) {
 	r.HandleFunc("/refreshed" , RefreshedListHandler)
 	r.HandleFunc("/list_limited" , ListLimited)
 	r.HandleFunc("/search" , SearchMusicName)
+	r.HandleFunc("/drives" , GetAvailableDrives)
 	r.HandleFunc("/item_detail" , GetMusicDetails)
 	log.Fatal(http.ListenAndServe("127.0.0.1:8002" , r))
 }
