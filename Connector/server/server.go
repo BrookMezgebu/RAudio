@@ -45,13 +45,19 @@ func PrintHelp (x http.ResponseWriter , b *http.Request) {
 	var commands Commands
 	enableACAO(&x)
 
-	command := Command{Com: "/limited_list/[NUM]", Fun: "gives json of [NUM] elements"}
+	command := Command{Com: "/help", Fun: "shows this json message"}
+	commands = append(commands, command)
+	command = Command{Com: "/list_limited?size=...", Fun: "gives json of [size] elements"}
 	commands = append(commands, command)
 	command = Command{Com: "/refreshed", Fun: "gives json of refreshed list"}
 	commands = append(commands, command)
-	command = Command{Com: "/list", Fun: "gives json of all the list items"}
+	command = Command{Com: "/list", Fun: "gives json of all the list items in the available disk drives"}
 	commands = append(commands, command)
-	command = Command{Com: "/search/[STRING]", Fun: "search from stuff"}
+	command = Command{Com: "/search?q=...&s=...", Fun: "search for the keyword in q and limit the size of the returned array to s"}
+	commands = append(commands, command)
+	command = Command{Com: "/drives", Fun: "available disk drives on the server"}
+	commands = append(commands, command)
+	command = Command{Com: "/item_detail?file...", Fun: "returns the detail about the music located at the specified location in file"}
 	commands = append(commands, command)
 
 	commandsJson, _ := json.Marshal(commands)
@@ -144,5 +150,5 @@ func StartServer (c []string) {
 	r.HandleFunc("/search" , SearchMusicName)
 	r.HandleFunc("/drives" , GetAvailableDrives)
 	r.HandleFunc("/item_detail" , GetMusicDetails)
-	log.Fatal(http.ListenAndServe("127.0.0.1:8002" , r))
+	log.Fatal(http.ListenAndServe("localhost:8002" , r))
 }
